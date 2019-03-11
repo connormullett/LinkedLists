@@ -1,176 +1,176 @@
 
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 /* given a head node write a function that counts
  * how many nodes are in the linked list */
 
-
 struct Node {
-    int data;
-    struct Node* next;
+  int data;
+  struct Node *next;
 };
 
 typedef struct {
-    int size;
-    struct Node* head;
-    struct Node* tail;
+  int size;
+  struct Node *head;
+  struct Node *tail;
 } LinkedList;
 
-struct Node* getLast(LinkedList* list);
-struct Node* createNode(int data, struct Node* next);
-LinkedList* insertNode(int value, LinkedList* list);
-struct Node* searchNode(int value, LinkedList* list);
-LinkedList* deleteFirstOccurence(int value, LinkedList* list);
-struct Node* deleteNode(struct Node* node, struct Node* head);
-struct Node* getPriorNode(struct Node* node, struct Node* head);
+struct Node *getLast(LinkedList *list);
+struct Node *createNode(int data, struct Node *next);
+LinkedList *insertNode(int value, LinkedList *list);
+struct Node *searchNode(int value, LinkedList *list);
+LinkedList *deleteFirstOccurence(int value, LinkedList *list);
+struct Node *deleteNode(struct Node *node, struct Node *head);
+struct Node *getPriorNode(struct Node *node, struct Node *head);
 
-LinkedList* createList();
+LinkedList *createList();
 
-void printList(LinkedList* list);
+void printList(LinkedList *list);
 
-int main(){
+int main() {
 
-    LinkedList* list = createList();
+  LinkedList *list = createList();
 
-    for(int i = 1; i < 5; ++i){
-        insertNode(i, list);
-    }
+  for (int i = 0; i < 5; ++i) {
+    insertNode(i, list);
+  }
 
-    printf("%d\n", list->size);
+  printf("list size = %d\n", list->size);
+  printList(list);
 
-    list = deleteFirstOccurence(5, list);
-    printList(list);
+  // seg fault here
+  list = deleteFirstOccurence(5, list);
+  printList(list);
 
-    return 0;
+  return 0;
 }
 
-/*
-allocats a list pointer the size of LinkedList
-with list->size equalling 0, and head and tail are Null
-*/
-LinkedList* createList(){
-    LinkedList* list = (LinkedList*)malloc(sizeof(LinkedList));
-    list->size = 0;
-    list->head = NULL;
-    list->tail = NULL;
-    return list;
+LinkedList *deleteFirstOccurence(int value, LinkedList *list) {
+  /*
+  deletes the node that contains
+  the first occurence of the value
+  */
+  struct Node *nodeToDelete = searchNode(value, list);
+
+  if (nodeToDelete != list->tail) {
+    list->tail = getPriorNode(list->tail, list->head);
+  }
+
+  list->head = deleteNode(nodeToDelete, list->head);
+  --(list->size);
+  return list;
 }
 
-/*
-Deletes all nodes in the list
-then frees the memory allocated to the list given
-*/
-void deleteList(LinkedList* list){
-    while(list->head != NULL){
-        list->head = deleteNode(list->head, list->head);
-    }
-
-    free(list);
+LinkedList *createList() {
+  /*
+  allocats a list pointer the size of LinkedList
+  with list->size equalling 0, and head and tail are Null
+  */
+  LinkedList *list = (LinkedList *)malloc(sizeof(LinkedList));
+  list->size = 0;
+  list->head = NULL;
+  list->tail = NULL;
+  return list;
 }
 
-LinkedList* deleteFirstOccurence(int value, LinkedList* list){
-    struct Node* nodeToDelete = searchNode(value, list);
+void deleteList(LinkedList *list) {
+  /*
+  Deletes all nodes in the list
+  then frees the memory allocated to the list given
+  */
+  while (list->head != NULL) {
+    list->head = deleteNode(list->head, list->head);
+  }
 
-    if(nodeToDelete != list->tail){
-        list->tail = getPriorNode(list->tail, list->head);
-    }
-
-    list->head = deleteNode(nodeToDelete, list->head);
-    (list->size)--;
-    return list;
+  free(list);
 }
 
-
-struct Node* deleteNode(struct Node* node, struct Node* head){
-    if(head == NULL) return NULL;
-
-    if(head == node){
-        struct Node* nextNode = head->next;
-        free(head);
-        return nextNode;
-    }
-
-    struct Node* priorNode = getPriorNode(node, head);
-    priorNode->next = node->next;
-    free(node);
-    return head;
-}
-
-struct Node* getPriorNode(struct Node* node, struct Node* head){
-    if(head == NULL || node == NULL || head == node) return NULL;
-
-    if(head->next == node) return head;
-
-    return getPriorNode(node, head->next);
-}
-
-struct Node* searchNode(int value, LinkedList* list){
-    struct Node* temp = list->head;
-    while(temp != NULL){
-        if((*temp).data == value){
-            return temp;
-        }
-
-        temp = temp->next;
-    }
-
+struct Node *deleteNode(struct Node *node, struct Node *head) {
+  if (head == NULL)
     return NULL;
+
+  if (head == node) {
+    struct Node *nextNode = head->next;
+    free(head);
+    return nextNode;
+  }
+
+  struct Node *priorNode = getPriorNode(node, head);
+  priorNode->next = node->next;
+  free(node);
+  return head;
 }
 
-void printList(LinkedList* list){
-    struct Node* temp = list->head;
-    for(int i = 0; i < list->size; ++i){
-        printf("%d ", temp->data);
-        temp = temp->next;
+struct Node *getPriorNode(struct Node *node, struct Node *head) {
+  if (head == NULL || node == NULL || head == node)
+    return NULL;
+
+  if (head->next == node)
+    return head;
+
+  return getPriorNode(node, head->next);
+}
+
+struct Node *searchNode(int value, LinkedList *list) {
+  struct Node *temp = list->head;
+  while (temp != NULL) {
+    if ((*temp).data == value) {
+      return temp;
     }
-    printf("\n");
+
+    temp = temp->next;
+  }
+
+  return NULL;
 }
 
-
-struct Node* createNode(int data, struct Node* next){
-
-    struct Node* returnNode = malloc(sizeof(struct Node));
-
-    returnNode->data = data;
-    returnNode->next = next;
-
-    return returnNode;
+void printList(LinkedList *list) {
+  struct Node *temp = list->head;
+  for (int i = 0; i < list->size; ++i) {
+    printf("%d ", temp->data);
+    temp = temp->next;
+  }
+  printf("\n");
 }
 
-//list = [1,]
-LinkedList* insertNode(int value, LinkedList* list){
+struct Node *createNode(int data, struct Node *next) {
 
-    struct Node* node = createNode(value, NULL);
-        
-    struct Node* lastNode = getLast(list);
+  struct Node *returnNode = malloc(sizeof(struct Node));
 
-    // if the head is null then its an empty list
-    if(list->head == NULL){
-        list->head = node;
-    } 
+  returnNode->data = data;
+  returnNode->next = next;
 
+  return returnNode;
+}
+
+LinkedList *insertNode(int value, LinkedList *list) {
+
+  struct Node *node = createNode(value, NULL);
+
+  // if the head and tail are null,
+  // then the list is empty, assign head/tail to node
+  if (list->tail == NULL && list->head == NULL) {
+    list->head = node;
     list->tail = node;
-
-    printf("assigning next ... \n");
-    //seg faults here, getLast is returning a null pointer
-    printf("%p\n", lastNode);  // ouput is NULL
-    lastNode->next = node;
-
-    (list->size)++;
-
+    ++(list->size);
     return list;
-}
+  }
 
-//return the node that doesnt point (null) to a node
-struct Node* getLast(LinkedList* list){
-    struct Node* temp = list->head;
-    while (temp->next != NULL){
-        if (temp->next == NULL){
-            return temp;
-        }
-        temp = temp->next;
-    }
-}
+  struct Node *lastNode = list->tail;
 
+  // if the head is null then its an empty list
+  if (list->head == NULL) {
+    list->head = node;
+  }
+
+  // assign the tail to the end of the list
+  list->tail = node;
+
+  lastNode->next = node;
+
+  ++(list->size);
+
+  return list;
+}
