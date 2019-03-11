@@ -41,7 +41,12 @@ int main() {
   printList(list);
 
   // seg fault here
+  list = deleteFirstOccurence(3, list);
+  printf("deleting 3 .. \n");
+  printList(list);
+
   list = deleteFirstOccurence(5, list);
+  printf("deleting 5 .. \n");
   printList(list);
 
   return 0;
@@ -54,13 +59,43 @@ LinkedList *deleteFirstOccurence(int value, LinkedList *list) {
   */
   struct Node *nodeToDelete = searchNode(value, list);
 
-  if (nodeToDelete != list->tail) {
+  if (nodeToDelete == NULL)
+    return list;
+
+  if (nodeToDelete != list->tail)
     list->tail = getPriorNode(list->tail, list->head);
-  }
 
   list->head = deleteNode(nodeToDelete, list->head);
   --(list->size);
   return list;
+}
+
+struct Node *getPriorNode(struct Node *node, struct Node *head) {
+  if (head == NULL || node == NULL || head == node) {
+    return NULL;
+  }
+
+  if (head->next == node) {
+    return head;
+  }
+  return getPriorNode(node, head->next);
+}
+
+struct Node *searchNode(int value, LinkedList *list) {
+  /*
+  searches for a node given a value
+  and a list to search through
+  */
+  struct Node *temp = list->head;
+  while (temp != NULL) {
+    if ((*temp).data == value) {
+      return temp;
+    }
+
+    temp = temp->next;
+  }
+
+  return NULL;
 }
 
 LinkedList *createList() {
@@ -101,29 +136,6 @@ struct Node *deleteNode(struct Node *node, struct Node *head) {
   priorNode->next = node->next;
   free(node);
   return head;
-}
-
-struct Node *getPriorNode(struct Node *node, struct Node *head) {
-  if (head == NULL || node == NULL || head == node)
-    return NULL;
-
-  if (head->next == node)
-    return head;
-
-  return getPriorNode(node, head->next);
-}
-
-struct Node *searchNode(int value, LinkedList *list) {
-  struct Node *temp = list->head;
-  while (temp != NULL) {
-    if ((*temp).data == value) {
-      return temp;
-    }
-
-    temp = temp->next;
-  }
-
-  return NULL;
 }
 
 void printList(LinkedList *list) {
