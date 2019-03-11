@@ -139,16 +139,23 @@ struct Node* createNode(int data, struct Node* next){
     return returnNode;
 }
 
+//list = [1,]
 LinkedList* insertNode(int value, LinkedList* list){
 
     struct Node* node = createNode(value, NULL);
-
+        
     struct Node* lastNode = getLast(list);
 
-    if(list->head == NULL) list->head = node;
+    // if the head is null then its an empty list
+    if(list->head == NULL){
+        list->head = node;
+    } 
 
     list->tail = node;
 
+    printf("assigning next ... \n");
+    //seg faults here, getLast is returning a null pointer
+    printf("%p\n", lastNode);  // ouput is NULL
     lastNode->next = node;
 
     (list->size)++;
@@ -156,6 +163,14 @@ LinkedList* insertNode(int value, LinkedList* list){
     return list;
 }
 
+//return the node that doesnt point (null) to a node
 struct Node* getLast(LinkedList* list){
-    return list->tail;
+    struct Node* temp = list->head;
+    while (temp->next != NULL){
+        if (temp->next == NULL){
+            return temp;
+        }
+        temp = temp->next;
+    }
 }
+
