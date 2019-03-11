@@ -17,23 +17,23 @@ typedef struct {
   struct Node *tail;
 } LinkedList;
 
-struct Node *getLast(LinkedList *list);
 struct Node *createNode(int data, struct Node *next);
-LinkedList *insertNode(int value, LinkedList *list);
-struct Node *searchNode(int value, LinkedList *list);
-LinkedList *deleteFirstOccurence(int value, LinkedList *list);
 struct Node *deleteNode(struct Node *node, struct Node *head);
+struct Node *getLast(LinkedList *list);
 struct Node *getPriorNode(struct Node *node, struct Node *head);
-
+struct Node *searchNode(int value, LinkedList *list);
 LinkedList *createList();
-
+LinkedList *deleteFirstOccurence(int value, LinkedList *list);
+LinkedList *insertNode(int value, LinkedList *list);
 void printList(LinkedList *list);
 
 int main() {
 
+  printf("creating list ..\n");
   LinkedList *list = createList();
 
-  for (int i = 0; i < 5; ++i) {
+  printf("populating list ..\n");
+  for (int i = 0; i < 10; ++i) {
     insertNode(i, list);
   }
 
@@ -42,43 +42,19 @@ int main() {
 
   // seg fault here
   list = deleteFirstOccurence(3, list);
-  printf("deleting 3 .. \n");
   printList(list);
 
-  list = deleteFirstOccurence(5, list);
-  printf("deleting 5 .. \n");
+  // delete function may not be reassigning last
+  printf("inserting node with value = 1\n");
+  insertNode(1, list);
+
   printList(list);
+
+  printf("searching for node with value 2 .. \n");
+  struct Node *searchedNode = searchNode(2, list);
+  printf("searched node's data = %d\n", searchedNode->data);
 
   return 0;
-}
-
-LinkedList *deleteFirstOccurence(int value, LinkedList *list) {
-  /*
-  deletes the node that contains
-  the first occurence of the value
-  */
-  struct Node *nodeToDelete = searchNode(value, list);
-
-  if (nodeToDelete == NULL)
-    return list;
-
-  if (nodeToDelete != list->tail)
-    list->tail = getPriorNode(list->tail, list->head);
-
-  list->head = deleteNode(nodeToDelete, list->head);
-  --(list->size);
-  return list;
-}
-
-struct Node *getPriorNode(struct Node *node, struct Node *head) {
-  if (head == NULL || node == NULL || head == node) {
-    return NULL;
-  }
-
-  if (head->next == node) {
-    return head;
-  }
-  return getPriorNode(node, head->next);
 }
 
 struct Node *searchNode(int value, LinkedList *list) {
@@ -96,6 +72,37 @@ struct Node *searchNode(int value, LinkedList *list) {
   }
 
   return NULL;
+}
+
+LinkedList *deleteFirstOccurence(int value, LinkedList *list) {
+  /*
+  deletes the node that contains
+  the first occurence of the value
+  */
+  struct Node *nodeToDelete = searchNode(value, list);
+
+  if (nodeToDelete == NULL)
+    return list;
+
+  // if the node is not the tail, get the prior node
+  if (nodeToDelete != list->tail)
+    list->tail = getPriorNode(list->tail, list->head);
+  else
+    list->head = deleteNode(nodeToDelete, list->head);
+
+  --(list->size);
+  return list;
+}
+
+struct Node *getPriorNode(struct Node *node, struct Node *head) {
+  if (head == NULL || node == NULL || head == node) {
+    return NULL;
+  }
+
+  if (head->next == node) {
+    return head;
+  }
+  return getPriorNode(node, head->next);
 }
 
 LinkedList *createList() {
@@ -149,6 +156,7 @@ void printList(LinkedList *list) {
 
 struct Node *createNode(int data, struct Node *next) {
 
+  // CALLED FROM INSERTNODE
   struct Node *returnNode = malloc(sizeof(struct Node));
 
   returnNode->data = data;
@@ -158,11 +166,10 @@ struct Node *createNode(int data, struct Node *next) {
 }
 
 LinkedList *insertNode(int value, LinkedList *list) {
-
+  // create the node
   struct Node *node = createNode(value, NULL);
 
-  // if the head and tail are null,
-  // then the list is empty, assign head/tail to node
+  // verify the list isn't empty
   if (list->tail == NULL && list->head == NULL) {
     list->head = node;
     list->tail = node;
@@ -170,18 +177,16 @@ LinkedList *insertNode(int value, LinkedList *list) {
     return list;
   }
 
-  struct Node *lastNode = list->tail;
-
-  // if the head is null then its an empty list
-  if (list->head == NULL) {
-    list->head = node;
-  }
+  // get the tail
+  struct Node *oldTail = list->tail;
 
   // assign the tail to the end of the list
   list->tail = node;
 
-  lastNode->next = node;
+  // the last node points to the new node
+  oldTail->next = node;
 
+  // increase size of the list
   ++(list->size);
 
   return list;
