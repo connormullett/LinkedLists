@@ -28,25 +28,27 @@ int main() {
   printf("creating list ..\n");
   LinkedList *list = createList();
 
-  printf("populating list ..\n");
+  printf("populating list ..\n\n");
   for (int i = 0; i < 10; ++i) {
     insert(i, list);
   }
 
-  printf("list size = %d\n", list->size);
+  printf("size :: %d\n\n", list->size);
   printList(list);
 
+  printf("deleting first occurence of 3 ..\n\n");
   list = deleteFirstOccurence(3, list);
   printList(list);
+  printf("size :: %d\n\n", list->size);
 
-  printf("inserting node with value = 1\n");
+  printf("inserting node with value :: 1\n\n");
   insert(1, list);
 
   printList(list);
 
-  printf("searching for node with value 2 .. \n");
+  printf("\nsearching for node with value 2 .. \n");
   struct Node *searchedNode = search(2, list);
-  printf("searched node's data = %d\n", searchedNode->data);
+  printf("searched node's data :: %d\n\n", searchedNode->data);
 
   return 0;
 }
